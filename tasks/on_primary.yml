@@ -1,0 +1,28 @@
+---
+- name: Temporary mount of the DRBD device
+  mount:
+    name=/data
+    src=/dev/drdb0
+    fstype=ext4
+    state=mounted
+  notify: restart heartbeat
+
+- name: Create exported directory
+  file:
+    path=/data/export
+    state=directory
+    mode=0777
+  notify: restart heartbeat
+
+- name: Move the NFS metadata to the DRBD device
+  shell: mv /var/lib/nfs/ /data/
+  when: stats.stat.isdir
+  notify: restart heartbeat
+
+- name: Unmount the DRBD device
+  mount:
+    name=/data
+    src=/dev/drbd0
+    fstype=ext4
+    state=unmounted
+  notify: restart heartbeat

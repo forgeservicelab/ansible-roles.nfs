@@ -4,33 +4,28 @@
     pkg=nfs-kernel-server
     state=present
 
-- name: Release heartbeat resources for local configuration
+- name: Release resources for local configuration
   service:
-    name=heartbeat
+    name={{ item }}
     state=stopped
   notify: restart heartbeat
-
-- name: Release DRBD resources for local configuration
-  service:
-    name=drbd
-    state=stopped
+  with_items:
+    - heartbeat
+    - drbd
 
 - name: Stop and disable NFS kernel server
   service:
-    name=nfs-kernel-server
+    name={{ item }}
     enabled=no
     state=stopped
   notify: restart heartbeat
-
-- name: Stop and disable NFS common
-  service:
-    name=nfs-common
-    enabled=no
-    state=stopped
+  with_items:
+    - nfs-kernel-server
+    - nfs-common
 
 - name: Configure NFS exports
   template:
-    src=../templates/exports.j2
+    src=exports.j2
     dest=/etc/exports
   notify: restart heartbeat
 
@@ -39,32 +34,13 @@
     path=/data
     state=directory
 
-- name: Temporary mount of the DRBD device
-  mount:
-    name=/data
-    src=/dev/drdb0
-    fstype=ext4
-    state=mounted
-  when: "primary is defined"
-  notify: restart heartbeat
-
-- name: Create exported directory
-  file:
-    path=/data/export
-    state=directory
-    mode=0777
-  when: "primary is defined"
-  notify: restart heartbeat
-
 - name: Check data symlink
   stat:
     path=/var/lib/nfs
   register: stats
 
-- name: Move the NFS metadata to the DRBD device
-  shell: mv /var/lib/nfs/ /data/
-  when: "primary is defined and stats.stat.isdir"
-  notify: restart heartbeat
+- name: Prepare NFS exports on DRBD device
+  include: on_primary.yml
 
 - name: Remove the NFS metadata
   file:
@@ -78,13 +54,4 @@
     src=/data/nfs/
     dest=/var/lib/nfs
     state=link
-  notify: restart heartbeat
-
-- name: Unmount the DRBD device
-  mount:
-    name=/data
-    src=/dev/drbd0
-    fstype=ext4
-    state=unmounted
-  when: "primary is defined"
   notify: restart heartbeat
