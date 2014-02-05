@@ -11,7 +11,7 @@
   notify: restart heartbeat
   with_items:
     - heartbeat
-    - drbd
+#    - drbd
 
 - name: Stop and disable NFS kernel server
   service:
@@ -41,6 +41,7 @@
 
 - name: Prepare NFS exports on DRBD device
   include: on_primary.yml
+  when: "primary is defined"
 
 - name: Remove the NFS metadata
   file:
