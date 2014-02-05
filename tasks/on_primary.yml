@@ -2,7 +2,7 @@
 - name: Temporary mount of the DRBD device
   mount:
     name=/data
-    src=/dev/drdb0
+    src=/dev/drbd0
     fstype=ext4
     state=mounted
   notify: restart heartbeat
