@@ -15,7 +15,7 @@ Role Variables
 
 - `heartbeat_service_name` - Name of the service to be managed by heartbeat as it appears on `/etc/init.d`, defaults to `nfs-kernel-server`.
 - `OS_FLOATIP` - Floating (Virtual) IP assigned to he HA cluster, read by the [ha-disk role](https://git.forgeservicelab.fi/ansible-roles/ha-disk).
-- `ROUTER_PUBLIC_IP` - IP of the public interface on the target network router. OpenStack specific, defines the IP that is allowed to mount the NFS share.
+- `ALLOWED_IPS` - List of IPs of the machines allowed to mount the NFS share; read from [ha-disk role](https://git.forgeservicelab.fi/ansible-roles/ha-disk). On OpenStack this should be the IP of the public interface on the network router.
 - `primary` - Flag that indicates the target host in which to run tasks that only need to be executed in one node. This is expected to be an inventory variable within the host group.
 
 
@@ -27,6 +27,10 @@ This role is dependent on the following roles, make sure you have made them avai
 - [common role](https://git.forgeservicelab.fi/ansible-roles/common)
 - [ha-disk role](https://git.forgeservicelab.fi/ansible-roles/ha-disk)
   
+Variables read from other roles:
+
+- `ALLOWED_IPS` - Read from [ha-disk role](https://git.forgeservcelab.fi/ansible-roles/ha-disk) unless overriden.
+
 Author Information
 ------------------
   

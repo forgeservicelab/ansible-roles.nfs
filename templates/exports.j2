@@ -1,1 +1,1 @@
-/data/export {{ ROUTER_PUBLIC_IP }}/255.255.255.255(rw,no_root_squash,no_all_squash,sync,fsid=123)
+/data/export {% for ALLOWED_IP in ALLOWED_IPS %}{{ ALLOWED_IP }}/255.255.255.255(rw,no_root_squash,no_all_squash,sync,fsid=123) {% endfor %}
