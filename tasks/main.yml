@@ -39,15 +39,24 @@
     path=/var/lib/nfs
   register: stats
 
+- name: Determine primary
+  shell: "drbdadm role {{ group_names[0] }}"
+  register: drbdstate
+
+- name: Set primary if needed
+  shell: "drbdadm primary {{ group_names[0] }}"
+  register: primaryset
+  when: "primary is defined and 'Primary' not in drbdstate.stdout.split('/')"
+
 - name: Prepare NFS exports on DRBD device
   include: on_primary.yml
-  when: "primary is defined"
+  when: "drbdstate.stdout.split('/')[0] == 'Primary' or primaryset.changed"
 
 - name: Remove the NFS metadata
   file:
     path=/var/lib/nfs/
     state=absent
-  when: "primary is not defined and stats.stat.isdir"
+  when: "drbdstate.stdout.split('/')[0] != 'Primary' and stats.stat.isdir"
   notify: restart heartbeat
 
 - name: Link the NFS metadata from its original location
