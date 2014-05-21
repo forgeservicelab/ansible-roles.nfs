@@ -1,23 +1,22 @@
 ---
 - name: Install NFS server
   apt:
-    pkg=nfs-kernel-server
-    state=present
+    pkg: nfs-kernel-server
+    state: present
 
 - name: Release resources for local configuration
   service:
-    name={{ item }}
-    state=stopped
+    name: "{{ item }}"
+    state: stopped
   notify: restart heartbeat
   with_items:
     - heartbeat
-#    - drbd
 
 - name: Stop and disable NFS kernel server
   service:
-    name={{ item }}
-    enabled=no
-    state=stopped
+    name: "{{ item }}"
+    enabled: no
+    state: stopped
   notify: restart heartbeat
   with_items:
     - nfs-kernel-server
@@ -25,26 +24,26 @@
 
 - name: Configure NFS exports
   template:
-    src=exports.j2
-    dest=/etc/exports
+    src: exports.j2
+    dest: /etc/exports
   notify: restart heartbeat
 
 - name: Configure NFS mountd
   lineinfile:
-    dest=/etc/default/nfs-kernel-server
-    regexp="^RPCMOUNTDOPTS=(.*)(?<!(--port 4001'))$"
-    line="RPCMOUNTDOPTS='\1 --port 4001'"
-    backrefs=yes
+    dest: /etc/default/nfs-kernel-server
+    regexp: "^RPCMOUNTDOPTS=(.*)(?<!(--port 4001'))$"
+    line: "RPCMOUNTDOPTS='\1 --port 4001'"
+    backrefs: yes
   notify: restart heartbeat
 
 - name: Create data directory
   file:
-    path=/data
-    state=directory
+    path: /data
+    state: directory
 
 - name: Check data symlink
   stat:
-    path=/var/lib/nfs
+    path: /var/lib/nfs
   register: stats
 
 - name: Determine primary
@@ -62,14 +61,14 @@
 
 - name: Remove the NFS metadata
   file:
-    path=/var/lib/nfs/
-    state=absent
+    path: /var/lib/nfs/
+    state: absent
   when: "drbdstate.stdout.split('/')[0] != 'Primary' and stats.stat.isdir"
   notify: restart heartbeat
 
 - name: Link the NFS metadata from its original location
   file:
-    src=/data/nfs/
-    dest=/var/lib/nfs
-    state=link
+    src: /data/nfs/
+    dest: /var/lib/nfs
+    state: link
   notify: restart heartbeat
