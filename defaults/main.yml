@@ -1,2 +1,4 @@
 ---
 heartbeat_service_name: nfs-kernel-server
+
+OS_FLOATIP:

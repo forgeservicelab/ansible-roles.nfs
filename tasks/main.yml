@@ -31,8 +31,8 @@
 - name: Configure NFS mountd
   lineinfile:
     dest: /etc/default/nfs-kernel-server
-    regexp: "^RPCMOUNTDOPTS=(.*)(?<!(--port 4001'))$"
-    line: "RPCMOUNTDOPTS='\1 --port 4001'"
+    regexp: ^RPCMOUNTDOPTS=(.*)(?<!(--port 4001'))$
+    line: RPCMOUNTDOPTS='\1 --port 4001'
     backrefs: yes
   notify: restart heartbeat
 
@@ -71,4 +71,5 @@
     src: /data/nfs/
     dest: /var/lib/nfs
     state: link
+    force: yes
   notify: restart heartbeat
