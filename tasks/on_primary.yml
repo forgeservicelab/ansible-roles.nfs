@@ -14,7 +14,7 @@
   notify: restart heartbeat
 
 - name: Move the NFS metadata to the DRBD device
-  shell: mv /var/lib/nfs/ /data/
+  shell: cp -r /var/lib/nfs/ /data/ && rm -rf /var/lib/nfs/
   when: stats.stat.isdir
   notify: restart heartbeat
 
