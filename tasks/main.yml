@@ -4,14 +4,6 @@
     pkg: nfs-kernel-server
     state: present
 
-- name: Release resources for local configuration
-  service:
-    name: "{{ item }}"
-    state: stopped
-  notify: restart heartbeat
-  with_items:
-    - heartbeat
-
 - name: Stop and disable NFS kernel server
   service:
     name: "{{ item }}"
