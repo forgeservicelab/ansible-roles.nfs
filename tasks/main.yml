@@ -21,12 +21,12 @@
   notify: restart heartbeat
 
 - name: Configure NFS mountd
-  lineinfile:
+  copy:
+    src: nfs-kernel-server
     dest: /etc/default/nfs-kernel-server
-    regexp: ^RPCMOUNTDOPTS=(.*)(?<!(--port 4001'))$
-    line: RPCMOUNTDOPTS='\1 --port 4001'
-    backrefs: yes
-  notify: restart heartbeat
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create data directory
   file:
